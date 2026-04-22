@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karina y Angel</title>
+    <style>
+        /* The Aesthetic Styling */
+        body {
+            background-color: #4c8da1; /* Muted Pastel Blue */
+            color: #1c1c1c;
+            font-family: "Times New Roman", Times, serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden; /* Prevents the whole page from scrolling */
+            touch-action: none; /* Helps mobile stay focused on the swipe */
+        }
+
+       .header-container {
+            position: absolute;
+            top: 40px;
+            width: 100%;
+            text-align: center;
+            z-index: 20; /* Keep text above the cards */
+        }
+
+        h1, h2 {
+            margin: 5px 0;
+            font-family: "Times New Roman", Times, serif;
+            font-weight: lighter;
+            letter-spacing: 1px;
+        }
+
+        h1 { font-size: 1.5rem; }
+        h2 { font-size: 1rem; opacity: 0.8; }
+
+       .gallery-container {
+            position: relative;
+            width: 85%;
+            max-width: 350px;
+            height: 450px;
+            perspective: 1000px;
+        }
+
+        .card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #f2f2f2;
+            padding: 15px 15px 40px 15px; /* Extra padding at the bottom (40px) */
+            box-sizing: border-box;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08); 
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            transition: transform 1.2s cubic-bezier(0.23, 1, 0.32, 1), opacity 1.2s;
+            cursor: grab;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Aligns content to the top */
+            align-items: center;
+        }
+
+
+        /* This class disables transitions so the card moves back instantly */
+        .no-transition {
+            transition: none !important;
+        }
+        .card img {
+            width: 100%;
+            height: 80%; /* Takes up the top 80% of the card */
+            object-fit: cover; /* This makes the photos look uniform and neat */
+            border-radius: 1px;
+        }
+
+        .card-text {
+            margin-top: auto; /* Pushes text to the very bottom of the flex container */
+            font-family: "Times New Roman", Times, serif;
+            font-size: 1.2rem;
+            color: #1c1c1c;
+            padding-bottom: 5px;
+        }
+
+        /* This class is added via JS to slide the top card away */
+        .slide-out {
+            transform: translateX(-150%) rotate(-20deg) !important;
+            opacity: 0;
+        }
+
+        .hint {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+</style>
+
+<body> 
+    <div class="header-container">
+        <h1>Para el amor de mi vida</h1>
+        <h2>Por mas momentos a  tu lado</h2>
+    </div>
+    <div class="gallery-container" id="gallery">
+        <div class="card" id="next-card" style="z-index: 5;">
+            <img id="next-img" src="" alt="">
+            <p class="card-text">Te amo -K</p>
+        </div>
+        <div class="card" id="current-card" style="z-index: 10;">
+            <img id="current-img" src="" alt="">
+            <p class="card-text">Te amo -K</p>
+        </div>
+    </div>
+</body>
+    
+<script>
+    const images = [
+        "https://lh3.googleusercontent.com/d/1Y5rDX6JbrorbssiZcFBAe0Jj4O5vOpxQ",
+        "https://lh3.googleusercontent.com/d/1wb9jIi4iY49nZ2nyXp1NyGpQZLWGT7Th",
+        "https://lh3.googleusercontent.com/d/1uiqKEhslxTtFCiKeULcnUjJAFruIA5nf",
+        "https://lh3.googleusercontent.com/d/1kGkim5HdcyMqsPtxybD3pSAMBs_qwrkK",
+        "https://lh3.googleusercontent.com/d/1iNx6JCeqw53kviSiFswXpwHQsqB6JbHZ",
+        "https://lh3.googleusercontent.com/d/1ePO6l_bBpui69wIxZ3l6Ys_rl5Nr9iLd",
+        "https://lh3.googleusercontent.com/d/1c_XgCxhYere3ufZiNxfv3gD9pTi_Nl9b",
+        "https://lh3.googleusercontent.com/d/1ZuDa_i7Ihsd3woYFNszYe0yPdFGiS6dj",
+        "https://lh3.googleusercontent.com/d/1TZzyCtZf_r6E_gWxH5TLwdoUxlLxcDhl",
+        "https://lh3.googleusercontent.com/d/1NaDSKzfkEZs4C_Pr_kMYh55jDnkuLtGw",
+        "https://lh3.googleusercontent.com/d/1IhpJcNJ3PqhLeRd3fDLQsJSvbKqdZwuw",
+        "https://lh3.googleusercontent.com/d/1I2lF9m-LfjlP2-Z0Q0VnGb2-DSzmp3dS",
+        "https://lh3.googleusercontent.com/d/1Ex27zvGNpp_X4E7z1lX701bqxqBAvFmx",
+        "https://lh3.googleusercontent.com/d/1DEPrYS4QmnwwTjk-5mZH7nDVOu9hWtTI",
+        "https://lh3.googleusercontent.com/d/18uaBhjZFkdXyGThjAp6qH-OheFeiXB9R",
+        "https://lh3.googleusercontent.com/d/14CeSyldHwzEL2mPdfcZnZqwyTgHCxjUi",
+        "https://lh3.googleusercontent.com/d/139jHAc1Bm_pZzfMlVwrBnAIAG8GeI5sK",
+        "https://lh3.googleusercontent.com/d/117mx1RCyt4oT_g-WFoN7IptRuklzeM1A",
+        "https://lh3.googleusercontent.com/d/1OLRugJxL49Skfyioe9vnzQ5jKsaBIaY7"
+    ];
+    let startX = 0;
+    const currentCard = document.getElementById('current-card');
+    const nextCard = document.getElementById('next-card');
+    const currentImg = document.getElementById('current-img');
+    const nextImg = document.getElementById('next-img');
+
+    function getRandomImg() {
+        return images[Math.floor(Math.random() * images.length)];
+    }
+
+    function init() {
+        currentImg.src = getRandomImg();
+        nextImg.src = getRandomImg();
+    }
+
+    // Swipe Logic
+    document.addEventListener('touchstart', e => {
+        startX = e.touches[0].clientX;
+    });
+
+    document.addEventListener('touchend', e => {
+        let endX = e.changedTouches[0].clientX;
+        if (startX - endX > 50) { // Swiped Left
+            swipe();
+        }
+    });
+
+  let isSwiping = false; // The "Lock"
+
+    document.addEventListener('touchend', e => {
+        let endX = e.changedTouches[0].clientX;
+        // Only swipe if we aren't already in the middle of an animation
+        if (!isSwiping && (startX - endX > 50)) { 
+            swipe();
+        }
+    });
+
+    function swipe() {
+        if (isSwiping) return;
+        isSwiping = true;
+
+        // 1. Slide the top card out
+        currentCard.classList.add('slide-out');
+        
+        setTimeout(() => {
+            // 2. Disable transition so we can move it back instantly
+            currentCard.classList.add('no-transition');
+            
+            // 3. Update the photo on the TOP card to be the one we just revealed
+            currentImg.src = nextImg.src; 
+            
+            // 4. Snap it back to the center (it happens so fast he won't see it)
+            currentCard.classList.remove('slide-out');
+            
+            // 5. Briefly wait for the browser to "realize" the card is back in the middle
+            setTimeout(() => {
+                // 6. Turn transitions back on for the NEXT swipe
+                currentCard.classList.remove('no-transition');
+                
+                // 7. Load a brand NEW random image into the hidden background card
+                nextImg.src = getRandomImg(); 
+                
+                isSwiping = false; // Unlock
+            }, 50); 
+
+        }, 1200); // Matches your 1.2s swipe speed
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>
